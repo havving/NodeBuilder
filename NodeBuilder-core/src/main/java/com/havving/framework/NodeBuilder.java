@@ -48,9 +48,6 @@ public class NodeBuilder {
     /**
      * NodeBuilder 기동 시작점
      * VM에 등록된 설정 정보를 검증하고, 실제 설정 정보를 생성하여 _build 메서드를 호출하여 기동
-     *
-     * @param args - 사용하지 않음
-     * @throws java.lang.Exception
      */
     public static void main(String[] args) {
         try {
