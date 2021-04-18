@@ -1,6 +1,7 @@
 package com.havving.framework;
 
 import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -10,6 +11,7 @@ import ch.qos.logback.core.rolling.FixedWindowRollingPolicy;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy;
 import ch.qos.logback.core.util.FileSize;
+import com.havving.framework.config.*;
 import com.havving.framework.domain.JvmGcData;
 import com.havving.framework.domain.JvmGcData.GcMemoryData;
 import com.sun.management.GarbageCollectionNotificationInfo;
@@ -73,8 +75,52 @@ public class NodeBuilder {
                 _initGCLogger();
             }
 
-        } catch (Exception e) {
+            Logger reflectionsLogger = loggerContext.getLogger("org.reflections");
+            reflectionsLogger.setLevel(Level.ERROR);
+            Logger httpLogger = loggerContext.getLogger("org.apache.httpcomponents");
+            httpLogger.setLevel(Level.ERROR);
 
+            NodeConfig config;
+
+            // 기동 검색 위치 설정
+            if (System.getProperty(SCAN_PKG.getKey()) != null) {
+                config = new NodeConfig();
+                config.setScanPackage(System.getProperty(SCAN_PKG.getKey()));
+                if (System.getProperty(APP_TYPE.getKey()) == null) {   // node.scan을 사용하려면 node.app.type을 지정해야 함
+                    log.warn(APP_TYPE.getKey() + " is null. This will run DAEMON mode.");
+                    System.setProperty(APP_TYPE.getKey(), AppType.DAEMON.toString());   // DAEMON 모드 default 설정
+                }
+                config.setAppType(AppType.getType(System.getProperty(APP_TYPE.getKey())));
+            } else {
+                ResourceResolver resolver;
+                String path;
+
+                // node.scan == null
+                if (System.getProperty(CONFIG_PATH.getKey()) != null) {   // node.path.conf (node-conf.xml 절대경로 위치 지정)
+                    resolver = new AbsolutePathResourceResolver();   // 절대경로를 읽어 파일 deserializer
+                    path = System.getProperty(CONFIG_PATH.getKey());
+                    log.info("-D{} exists. Using config path '{}", CONFIG_PATH.getKey(), path);
+                } else {    // node.path.conf, node.scan == null
+                    resolver = new ClassPathResourceResolver();   // classpath 아래의 node-conf.xml 파일 검색
+                    path = "classpath:node-conf.xml";
+                    log.info("-D{} argument didn't found. node-conf.xml find start... '{}'", SCAN_PKG.getKey(), path);
+                }
+
+                try {
+                    config = resolver.read(path);   // 파일 deserializer
+                } catch (Exception e) {
+                    config = null;
+                    log.error(e.toString(), e);
+                    log.error("node configuration file couldn't read. Process goes down.");
+                    System.exit(-1);
+                }
+            }
+
+
+
+        } catch (Exception e) {
+            log.error(e.toString(), e);
+            System.exit(-1);
         }
 
     }
@@ -122,13 +168,13 @@ public class NodeBuilder {
                 break;
             }
         }
-        ch.qos.logback.classic.Logger nodeLogger = loggerContext.getLogger(NODE_LOGGER);
+        Logger nodeLogger = loggerContext.getLogger(NODE_LOGGER);
         consoleAppender.ifPresent(nodeLogger::addAppender);
         nodeLogger.addAppender(rfAppender);
         nodeLogger.setAdditive(false);
         nodeLogger.setLevel(Level.TRACE);
 
-        ch.qos.logback.classic.Logger frameworkLogger = loggerContext.getLogger("com.havving.framework");
+        Logger frameworkLogger = loggerContext.getLogger("com.havving.framework");
         frameworkLogger.addAppender(rfAppender);
         frameworkLogger.setLevel(Level.TRACE);
     }

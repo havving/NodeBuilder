@@ -8,7 +8,7 @@ import lombok.Setter;
  *
  * APP_NAME("node.app.name") → APP Name 설정
  * APP_TYPE("node.app.type") → 기동 모드 설정 (FIRE/DAEMON)
- * SCAN_PKG("node.scan") → @Component 스캔 패키지명
+ * SCAN_PKG("node.scan") → @Component 스캔 패키지명 (최상위 패키지명)
  * LOG_LEVEL("node.log.level") → NodeBuilder 전용 Log Level 설정 (default: DEBUG)
  * STAT_METHOD("node.log.stat_method") → @Component의 methodTracing을 true로 설정한 컴포넌트의 각 메서드 수행 시간 로그 출력 여부 설정 (true/false)
  * PID_PATH("node.path.pid") → 기동 시 pid 파일을 생성할 위치 지정
