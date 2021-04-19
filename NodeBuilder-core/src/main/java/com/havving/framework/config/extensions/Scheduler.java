@@ -1,17 +1,15 @@
-package com.havving.framework.config.extentions;
+package com.havving.framework.config.extensions;
 
 import lombok.Data;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import static com.havving.framework.config.extentions.Scheduler.Type.Java;
+import static com.havving.framework.config.extensions.Scheduler.Type.Java;
 
 /**
  * @author HAVVING

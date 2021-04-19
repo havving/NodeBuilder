@@ -1,4 +1,4 @@
-package com.havving.framework.config.extentions;
+package com.havving.framework.config.extensions;
 
 import lombok.Data;
 import org.simpleframework.xml.Attribute;
@@ -41,7 +41,6 @@ public class Cluster implements Externalizable {
         out.writeObject(members);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         this.port = (int) in.readObject();

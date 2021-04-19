@@ -1,9 +1,9 @@
 package com.havving.framework.config;
 
-import com.havving.framework.config.extentions.Cluster;
-import com.havving.framework.config.extentions.Scheduler;
-import com.havving.framework.config.extentions.StoreInfo;
-import com.havving.framework.config.extentions.WebApp;
+import com.havving.framework.config.extensions.Cluster;
+import com.havving.framework.config.extensions.Scheduler;
+import com.havving.framework.config.extensions.StoreInfo;
+import com.havving.framework.config.extensions.WebApp;
 import lombok.Data;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;

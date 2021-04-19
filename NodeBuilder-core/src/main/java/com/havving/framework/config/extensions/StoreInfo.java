@@ -1,13 +1,10 @@
-package com.havving.framework.config.extentions;
+package com.havving.framework.config.extensions;
 
 import lombok.Data;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -41,7 +38,6 @@ public class StoreInfo implements Externalizable {
         out.writeObject(searchableFields);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         this.storeName = (String) in.readObject();

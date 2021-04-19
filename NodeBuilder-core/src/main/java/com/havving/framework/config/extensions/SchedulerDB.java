@@ -1,4 +1,4 @@
-package com.havving.framework.config.extentions;
+package com.havving.framework.config.extensions;
 
 import lombok.Data;
 import org.simpleframework.xml.Attribute;

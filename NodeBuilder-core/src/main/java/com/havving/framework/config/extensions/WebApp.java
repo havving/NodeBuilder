@@ -1,10 +1,9 @@
-package com.havving.framework.config.extentions;
+package com.havving.framework.config.extensions;
 
 import lombok.Data;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;

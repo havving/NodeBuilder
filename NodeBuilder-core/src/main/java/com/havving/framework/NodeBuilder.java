@@ -14,6 +14,7 @@ import ch.qos.logback.core.util.FileSize;
 import com.havving.framework.config.*;
 import com.havving.framework.domain.JvmGcData;
 import com.havving.framework.domain.JvmGcData.GcMemoryData;
+import com.havving.framework.exception.ContainerInitializeException;
 import com.sun.management.GarbageCollectionNotificationInfo;
 import com.sun.management.GcInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -116,7 +117,7 @@ public class NodeBuilder {
                 }
             }
 
-
+            _build(appName, config, args);
 
         } catch (Exception e) {
             log.error(e.toString(), e);
@@ -125,6 +126,18 @@ public class NodeBuilder {
 
     }
 
+
+    /**
+     * 내부 빌드 메서드
+     *
+     * @param appName
+     * @param config
+     * @param args
+     */
+    private static void _build(String appName, NodeConfig config, String[] args) throws ContainerInitializeException {
+        NodeContext context = NodeContext.getInstance();
+        context.init(config.getScanPackage());
+    }
 
 
     private static void initLogFileAppender(LoggerContext loggerContext, String appName, Level logLevel) {

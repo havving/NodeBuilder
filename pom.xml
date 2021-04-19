@@ -17,6 +17,7 @@
         <slf4j.v>1.7.7</slf4j.v>
         <log4j.v>1.2.12</log4j.v>
         <logback.v>1.2.3</logback.v>
+        <reflections.v>0.9.11</reflections.v>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
@@ -64,6 +65,13 @@
             <groupId>org.simpleframework</groupId>
             <artifactId>simple-xml</artifactId>
             <version>2.7.1</version>
+        </dependency>
+
+        <!-- Reflections -->
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>${reflections.v}</version>
         </dependency>
     </dependencies>
 
