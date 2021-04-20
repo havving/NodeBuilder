@@ -35,9 +35,9 @@
             <version>${slf4j.v}</version>
         </dependency>
         <dependency>
-        <groupId>log4j</groupId>
-        <artifactId>log4j</artifactId>
-        <version>${log4j.v}</version>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${log4j.v}</version>
         </dependency>
 
         <!-- Lombok library -->
@@ -73,6 +73,22 @@
             <artifactId>reflections</artifactId>
             <version>${reflections.v}</version>
         </dependency>
+
+        <!-- Junit test framework -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/cglib/cglib -->
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib-nodep</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+
     </dependencies>
 
 </project>

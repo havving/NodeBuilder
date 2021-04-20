@@ -18,8 +18,8 @@ import static com.havving.framework.components.Container.CoreExtensions.DEFAULT;
  */
 @Slf4j
 public class NodeContext {
-    private static final NodeContext context = new NodeContext();
-    private final Map<Container.CoreExtensions, Container> containers;
+    private static final NodeContext context = new NodeContext();   // 한 프로세스 내에 단일 context만 생성토록 함
+    private final Map<Container.CoreExtensions, Container> containers;  // Container 저장 객체
 
     private NodeContext() {
         this.containers = new EnumMap<>(Container.CoreExtensions.class);
@@ -27,12 +27,25 @@ public class NodeContext {
         Runtime.getRuntime().addShutdownHook(DEFAULT_SHUTDOWN);
     }
 
+    /**
+     * singleton 방식으로 NodeContext return
+     *
+     * @return 단일 생성 된 context 객체
+     */
     static NodeContext getInstance() {
         if (context.containers.get(DEFAULT) != null && !context.containers.get(DEFAULT).valid())
             log.warn("Scan package didn't apply yet. Please run init method.");
         return context;
     }
 
+
+    /**
+     * 기본 core 생성 및 등록
+     *
+     * @param scanPackage @Component를 스캔할 패키지명
+     * @see com.havving.framework.annotation.Component
+     * @throws ContainerInitializeException
+     */
     public void init(String scanPackage) throws ContainerInitializeException {
         this.containers.put(DEFAULT, new ComponentContainer().initializeToScan(scanPackage));
     }

@@ -1,8 +1,11 @@
 package com.havving.framework.components;
 
+import com.havving.framework.annotation.Bind;
+import com.havving.framework.annotation.Component;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,6 +19,25 @@ public class ComponentDependencyResolver {
     @Getter
     private Set<DependencyIdMaps> values;
 
+
+    /**
+     * Bind 가능한 필드인지 확인
+     *
+     * @param field Component 내에 선언된 필드
+     * @return t or f
+     */
+    public static boolean isBindableField(Field field) {
+        return field.getAnnotations().length > 0 &&
+                field.getDeclaredAnnotation(Bind.class) != null &&
+                field.getType().isAnnotationPresent(Component.class);
+    }
+
+
+    /**
+     *
+     * @param policyFactory D/I 정책 내장 객체
+     * @return 계산이 완료된 D/I 정의
+     */
     public Set<DependencyIdMaps> resolve(ComponentPolicyFactory policyFactory) {
         Set<DependencyIdMaps> idMapsSet = new HashSet<>();
 
@@ -23,7 +45,7 @@ public class ComponentDependencyResolver {
             BindPolicy policy = policyFactory.getPolicy(id);
             PolicyDefine define = policyFactory.getDefine(policy, id);
 
-
+            // TODO
         });
         this.values = idMapsSet;
 

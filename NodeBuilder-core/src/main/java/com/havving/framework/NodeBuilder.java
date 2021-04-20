@@ -135,8 +135,8 @@ public class NodeBuilder {
      * @param args
      */
     private static void _build(String appName, NodeConfig config, String[] args) throws ContainerInitializeException {
-        NodeContext context = NodeContext.getInstance();
-        context.init(config.getScanPackage());
+        NodeContext context = NodeContext.getInstance();    // 인스턴스(한 번 사용하고 버림) 객체를 얻어
+        context.init(config.getScanPackage());  // config의 scanPakcage 정보를 가져와 기본 core를 생성하고 등록한다.
     }
 
 
