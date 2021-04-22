@@ -12,6 +12,7 @@ import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy;
 import ch.qos.logback.core.util.FileSize;
 import com.havving.framework.config.*;
+import com.havving.framework.domain.Configuration;
 import com.havving.framework.domain.JvmGcData;
 import com.havving.framework.domain.JvmGcData.GcMemoryData;
 import com.havving.framework.exception.ContainerInitializeException;
@@ -47,6 +48,15 @@ public class NodeBuilder {
     private static final String NODE_LOGGER = "node-logger";
     private static final ThreadLocal<VmDataHandlingWorker> gcDataHandlingWorker = new ThreadLocal<VmDataHandlingWorker>();
     private static volatile boolean GC_HANDLER_REGISTERED = false;
+    /**
+     * 기동 시 생성되는 실제 context 객체
+     * 기동 시, 설정 정보 등 NodeBuilder에서 관장하는 모든 데이터를 내장
+     * NodeBuilder.getContext()로 호출 가능
+     */
+    private static NodeContext context;
+
+    public NodeBuilder() {
+    }
 
     /**
      * NodeBuilder 기동 시작점
@@ -135,8 +145,17 @@ public class NodeBuilder {
      * @param args
      */
     private static void _build(String appName, NodeConfig config, String[] args) throws ContainerInitializeException {
-        NodeContext context = NodeContext.getInstance();    // 인스턴스(한 번 사용하고 버림) 객체를 얻어
+        NodeContext context = NodeContext.getInstance();    // 인스턴스(한 번 사용하고 버림) 객체를 얻어,
         context.init(config.getScanPackage());  // config의 scanPakcage 정보를 가져와 기본 core를 생성하고 등록한다.
+
+        Configuration configuration = Configuration.init(appName);  // node.app.name을 이용하여 고유의 Configuration 객체를 생성한다.
+        configuration.apply(config);    // 외부 config를 가져와 내부 config에 update 한다.
+        context.setConfig(configuration);   // configuration을 설정한다.
+        if (System.getProperty(STAT_VM.getKey()) != null) {
+            NodeContext.activateVmStatCollector();  // VM Stat을 수집한다.
+        }
+        NodeBuilder.context = context;  // 기동 시 생성되는 실제 context 객체에, 위에서 설정한 context 객체를 할당한다.
+//        context.activateExtensions();   // Extension 인터페이스를 상속받은 모듈 객체를 활성화하여 Container로 등록한다.
     }
 
 

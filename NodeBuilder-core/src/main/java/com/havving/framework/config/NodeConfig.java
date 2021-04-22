@@ -20,7 +20,7 @@ import java.util.Collection;
 @Data
 @Root(name = "node", strict = false)
 public class NodeConfig implements Serializable {
-    private static final long serialVersionUID = -5044744512834052454L;
+    private static final long serialVersionUID = 115861977084097657L;
 
     @Attribute(name = "scan-package")
     private String scanPackage;
