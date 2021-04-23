@@ -10,13 +10,18 @@ import com.havving.framework.exception.ContainerInitializeException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.reflections.Reflections;
 
 import java.lang.management.*;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Constructor;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Semaphore;
+import java.util.stream.Collectors;
 
 import static com.havving.framework.components.Container.CoreExtensions.DEFAULT;
 
@@ -111,10 +116,62 @@ public class NodeContext {
      *
      * @param scanPackage @Component를 스캔할 패키지명
      * @see com.havving.framework.annotation.Component
-     * @throws ContainerInitializeException
      */
     public void init(String scanPackage) throws ContainerInitializeException {
         this.containers.put(DEFAULT, new ComponentContainer().initializeToScan(scanPackage));
     }
 
+
+    /**
+     * Extension 인터페이스를 상속받은 모듈 객체를 활성화하여 Container로 등록
+     *
+     * @see com.havving.framework.Extension
+     * @see com.havving.framework.components.Container
+     */
+    public void activateExtensions() throws ContainerInitializeException {
+        Set<Class<? extends Extension>> extensions = new Reflections("com.havving").getSubTypesOf(Extension.class);
+        List<Class<? extends Extension>> sortedExtension = extensions.stream().sorted((e1, e2) ->
+                e1.getSimpleName().equals("NodeClusterExtension") ? -1 : 0
+        ).collect(Collectors.toList());
+
+        for (Class<? extends Extension> e : sortedExtension) {
+            try {
+                log.info("{} has been found. Extension activate starts.", e.getName());
+                Constructor constructor = e.getConstructor();
+                if (constructor == null) {
+                    log.error("NodeBuilder couldn't find Extension's default constructor.");
+                    throw new ContainerInitializeException("NodeBuilder couldn't find Extension's default constructor.");
+                }
+
+                Extension extension = e.newInstance();
+                if (extension.initializable()) {
+                    addContainer(extension.activate());
+                    log.info("{} init complete.", e.getName());
+                }
+
+            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | ContainerInitializeException e1) {
+                throw new ContainerInitializeException(e1);
+            }
+        }
+    }
+
+
+    /**
+     * Container 객체 등록 후 재사용 할 수 있도록 리턴
+     *
+     * @param container Container 인터페이스 상속 객체
+     * @return 등록된 Container 객체
+     * @see com.havving.framework.components.Container
+     */
+    public Container addContainer(Container container) {
+        Container.CoreExtensions type = container.getExtensionType();
+        if (containers.containsKey(type)) {
+            log.warn("Component container type {} already exists. Component will be updated.", type);
+            log.debug("\t\twas : {}", containers.get(type));
+            log.debug("\t\t be : {}", container);
+        }
+        this.containers.put(container.getExtensionType(), container);
+
+        return container;
+    }
 }

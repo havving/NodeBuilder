@@ -155,7 +155,7 @@ public class NodeBuilder {
             NodeContext.activateVmStatCollector();  // VM Stat을 수집한다.
         }
         NodeBuilder.context = context;  // 기동 시 생성되는 실제 context 객체에, 위에서 설정한 context 객체를 할당한다.
-//        context.activateExtensions();   // Extension 인터페이스를 상속받은 모듈 객체를 활성화하여 Container로 등록한다.
+        context.activateExtensions();   // Extension 인터페이스를 상속받은 모듈 객체를 활성화하여 Container로 등록한다.
     }
 
 
