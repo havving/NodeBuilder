@@ -2,6 +2,7 @@ package com.havving.framework;
 
 import com.havving.framework.annotation.Shared;
 import com.havving.framework.components.ComponentContainer;
+import com.havving.framework.components.ComponentPolicyFactory;
 import com.havving.framework.components.Container;
 import com.havving.framework.domain.Configuration;
 import com.havving.framework.domain.VmStat;
@@ -173,5 +174,16 @@ public class NodeContext {
         this.containers.put(container.getExtensionType(), container);
 
         return container;
+    }
+
+
+    /**
+     * Object Factory에 사용된 Life-Cycle 정책을 내장한 Factory를 반환
+     *
+     * @return Life-Cycle 정책 Factory
+     * @see com.havving.framework.components.ComponentPolicyFactory
+     */
+    public ComponentPolicyFactory getPolicyFactory() {
+        return ((ComponentContainer) this.containers.get(DEFAULT)).getPolicyFactory();
     }
 }

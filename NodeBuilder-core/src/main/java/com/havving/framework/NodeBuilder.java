@@ -11,6 +11,7 @@ import ch.qos.logback.core.rolling.FixedWindowRollingPolicy;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy;
 import ch.qos.logback.core.util.FileSize;
+import com.havving.framework.components.BindPolicy;
 import com.havving.framework.config.*;
 import com.havving.framework.domain.Configuration;
 import com.havving.framework.domain.JvmGcData;
@@ -19,16 +20,20 @@ import com.havving.framework.exception.ContainerInitializeException;
 import com.sun.management.GarbageCollectionNotificationInfo;
 import com.sun.management.GcInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.LoggerFactory;
 
 import javax.management.Notification;
 import javax.management.NotificationEmitter;
 import javax.management.NotificationListener;
 import javax.management.openmbean.CompositeData;
+import java.io.File;
+import java.io.IOException;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +59,25 @@ public class NodeBuilder {
      * NodeBuilder.getContext()로 호출 가능
      */
     private static NodeContext context;
+
+    /**
+     * 프로세스를 up 상태로 유지시켜줄 Daemon Thread
+     * DAEMON 모드일 경우, 프로세스 기동과 함께 실행되며, NodeBuilder.exit() 메서드로 interrupted 발생
+     * @see com.havving.framework.config.AppType
+     */
+    private static final ThreadLocal<Thread> daemon = ThreadLocal.withInitial(() -> new Thread("WAIT_DAEMON") {
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    Thread.sleep(30 * 1000);
+                } catch (InterruptedException e) {
+                    log.info("DAEMON thread interrupted. Node goes down.");
+                    break;
+                }
+            }
+        }
+    });
 
     public NodeBuilder() {
     }
@@ -129,11 +153,72 @@ public class NodeBuilder {
 
             _build(appName, config, args);
 
+            if (config.getAppType() == null || config.getAppType().equals(AppType.DAEMON)) {
+                log.info("Node has been set DAEMON mode.");
+                daemon.get().start();
+            } else {
+                log.info("Node app-type doesn't set. This process will be executing once.");
+            }
+            log.info("Node '" + appName + "' running success.");
+            log.info("\n___________________________________________________________________________________________________________\n" +
+                    "    _     _      __      _____     _____     ____      _     _     __    _       _____     _____     ____  \n" +
+                    "    /|   /     /    )    /    )    /    '    /   )     /    /      /     /       /    )    /    '    /    )\n" +
+                    "---/-| -/-----/----/----/----/----/__-------/__ /-----/----/------/-----/-------/----/----/__-------/___ /-\n" +
+                    "  /  | /     /    /    /    /    /         /    )    /    /      /     /       /    /    /         /    |  \n" +
+                    "_/___|/_____(____/____/____/____/____ ____/____/____(____/____ _/_ ___/____/__/____/____/____ ____/_____|__\n" +
+                    "                                                                                                           \n" +
+                    "___________________________________________________________________________________________________________\n");
+
+            String pid;
+
+            if (System.getProperty(PID_PATH.getKey()) != null) {
+                String pidFilePath = System.getProperty(PID_PATH.getKey());
+                pid = _createPidFile(pidFilePath + "/" + appName);
+            } else {
+                String name = ManagementFactory.getRuntimeMXBean().getName();
+                pid = name.split("@")[0];
+            }
+
+            log.info("\n___________________________________________________________________________________________________________\n" +
+                            "<<<<<<<<<<<<<< {} Node up and work starts." + "\n" +
+                            "  <<<<<<<<<<<<    name : {}\n" +
+                            "    <<<<<<<<<<    pid : {}\n" +
+                            "      <<<<<<<<    components(singleton) : {}\n" +
+                            "        <<<<<<    components(instant) : {}\n" +
+                            "___________________________________________________________________________________________________________\n",
+                    LocalDateTime.now(), appName, pid,
+                    context.getPolicyFactory().get(BindPolicy.Singleton).size(),
+                    context.getPolicyFactory().get(BindPolicy.Instant).size()
+            );
+
         } catch (Exception e) {
             log.error(e.toString(), e);
             System.exit(-1);
         }
 
+    }
+
+
+    private static String _createPidFile(String appName) {
+        try {
+            File pidFile = new File(appName + ".pid");
+            if (pidFile.exists()) {
+                FileUtils.forceDelete(pidFile);
+            }
+            String name = ManagementFactory.getRuntimeMXBean().getName();
+            String pid = name.split("@")[0];
+            FileUtils.write(pidFile, pid, Charset.forName("UTF-8"), false);
+            String logString = "Process ID file has been initialized. pid: " + pid + " locaction: " + pidFile.getAbsoluteFile();
+            System.out.println(logString);
+            log.info(logString);
+
+            return pid;
+
+        } catch (IOException e) {
+            log.error("", e);
+
+            return null;
+        }
     }
 
 
