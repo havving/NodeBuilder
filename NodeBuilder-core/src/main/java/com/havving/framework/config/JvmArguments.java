@@ -1,5 +1,6 @@
 package com.havving.framework.config;
 
+import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,16 +18,17 @@ import java.util.Map;
  */
 @Slf4j
 @ToString
-public class JvmArguments implements Externalizable {
+public final class JvmArguments implements Externalizable {
     private static final long serialVersionUID = 660938109902477100L;
     private static transient final String EMPTY = "";
 
+    @Getter
     private Map<String, String> argsMap;
 
     public JvmArguments() {
     }
 
-    public JvmArguments(int length) {
+    private JvmArguments(int length) {
         argsMap = new HashMap<>(length);
     }
 

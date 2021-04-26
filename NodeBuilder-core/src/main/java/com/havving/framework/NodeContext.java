@@ -43,7 +43,6 @@ public class NodeContext {
     private static Callable<VmStat> vmCollectWorker;
     private static WeakReference<VmStat> vmStatCache;
 
-
     private NodeContext() {
         this.containers = new EnumMap<>(Container.CoreExtensions.class);
         Thread DEFAULT_SHUTDOWN = new Thread(() -> log.info("Node goes down."));
