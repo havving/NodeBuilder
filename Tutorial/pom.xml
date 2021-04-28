@@ -7,23 +7,20 @@
         <groupId>com.havving.framework</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>NodeBuilder-core</artifactId>
-    <packaging>jar</packaging>
-    <name>NodeBuilder-core</name>
-    <dependencies>
-        <dependency>
-            <groupId>com.havving.framework</groupId>
-            <artifactId>NodeBuilder-web</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
+
+    <artifactId>Tutorial</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.havving.framework</groupId>
+            <artifactId>NodeBuilder-core</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

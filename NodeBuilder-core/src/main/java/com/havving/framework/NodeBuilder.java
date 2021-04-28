@@ -19,6 +19,7 @@ import com.havving.framework.domain.JvmGcData.GcMemoryData;
 import com.havving.framework.exception.ContainerInitializeException;
 import com.sun.management.GarbageCollectionNotificationInfo;
 import com.sun.management.GcInfo;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,7 @@ public class NodeBuilder {
      * 기동 시, 설정 정보 등 NodeBuilder에서 관장하는 모든 데이터를 내장
      * NodeBuilder.getContext()로 호출 가능
      */
+    @Getter
     private static NodeContext context;
 
     /**

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- console log -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%-5level][%logger]%msg\(%file:%line\)%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- file log -->
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/node.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 파일이 하루에 한개씩 생성된다 -->
+            <fileNamePattern>node.%d{yyyy-MM-dd}.log</fileNamePattern>
+
+            <!-- maxHistory 설정은 위 부분에 롤링 정책에 따라 적용된다.
+             위 설정대로 30일이 지난 파일은 삭제가 된다.-->
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%-5level][%logger]%msg\(%file:%line\)%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.havving.framework" level="debug">
+        <appender-ref ref="file"/>
+    </logger>
+
+    <root level="info">
+        <appender-ref ref="console"/>
+        <appender-ref ref="file"/>
+    </root>
+
+</configuration>

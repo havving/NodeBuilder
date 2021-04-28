@@ -4,6 +4,7 @@ import com.havving.framework.annotation.Shared;
 import com.havving.framework.components.ComponentContainer;
 import com.havving.framework.components.ComponentPolicyFactory;
 import com.havving.framework.components.Container;
+import com.havving.framework.components.SingletonProxyFactory;
 import com.havving.framework.domain.Configuration;
 import com.havving.framework.domain.VmStat;
 import com.havving.framework.domain.VmStatBuilder;
@@ -177,6 +178,22 @@ public class NodeContext {
 
 
     /**
+     * Context에 등록된 container를 모듈 타입에 기반하여 반환. Generic을 이용한 Type-Casting 지원
+     * @param type 모듈 타입
+     * @return Container 객체
+     * @see com.havving.framework.components.Container
+     * @see com.havving.framework.components.Container.CoreExtensions
+     */
+    public <T extends Container> T getContainer(Container.CoreExtensions type) {
+        Container result = this.containers.get(type);
+        if (result == null) return null;
+        Class<T> containerClz = (Class<T>) result.getClass();
+
+        return containerClz.cast(result);
+    }
+
+
+    /**
      * Object Factory에 사용된 Life-Cycle 정책을 내장한 Factory를 반환
      *
      * @return Life-Cycle 정책 Factory
@@ -184,5 +201,15 @@ public class NodeContext {
      */
     public ComponentPolicyFactory getPolicyFactory() {
         return ((ComponentContainer) this.containers.get(DEFAULT)).getPolicyFactory();
+    }
+
+
+    /**
+     * context에 등록된 Object Factory를 반환
+     * @return Component Object들이 등록된 Factory
+     * @see com.havving.framework.components.SingletonProxyFactory
+     */
+    public SingletonProxyFactory getObjectFactory() {
+        return (SingletonProxyFactory) this.containers.get(DEFAULT).getFactory();
     }
 }

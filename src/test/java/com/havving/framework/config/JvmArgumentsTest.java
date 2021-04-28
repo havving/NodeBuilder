@@ -1,6 +1,5 @@
 package com.havving.framework.config;
 
-import com.havving.framework.config.JvmArguments;
 import org.junit.Ignore;
 import org.junit.Test;
 
