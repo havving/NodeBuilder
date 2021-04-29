@@ -6,10 +6,14 @@ package com.havving.framework.web;
  */
 public class HttpProvider {
     public enum HttpMethod {
-        GET, POST
+        HEAD, GET, POST, PUT, DELETE
     }
 
     public enum ContentType {
-        JSON
+        JSON;
+
+        public String getMimeType() {
+            return null;
+        }
     }
 }
