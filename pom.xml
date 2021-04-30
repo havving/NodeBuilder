@@ -13,6 +13,7 @@
         <module>NodeBuilder-core</module>
         <module>Tutorial</module>
         <module>NodeBuilder-web</module>
+        <module>NodeBuilder-cluster</module>
     </modules>
 
     <properties>

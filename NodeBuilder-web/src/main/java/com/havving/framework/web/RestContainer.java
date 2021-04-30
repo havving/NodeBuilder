@@ -4,6 +4,8 @@ import com.google.gson.*;
 import com.havving.framework.NodeBuilder;
 import com.havving.framework.NodeContext;
 import com.havving.framework.annotation.RestBinder;
+import com.havving.framework.cluster.ClusterContainer;
+import com.havving.framework.cluster.SharedMap;
 import com.havving.framework.components.ComponentPolicyFactory;
 import com.havving.framework.components.Container;
 import com.havving.framework.components.SingletonProxyFactory;
@@ -12,9 +14,12 @@ import com.havving.framework.domain.Configuration;
 import com.havving.framework.exception.ContainerInitializeException;
 import lombok.extern.slf4j.Slf4j;
 import spark.*;
+import spark.route.RouteOverview;
 import spark.utils.IOUtils;
 
 import java.lang.reflect.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -96,12 +101,16 @@ public class RestContainer implements Container<RestDefineFactory> {
         _initServer(webAppConf, singletonProxyFactory);
 
         if (clusterContainer != null) {
-//            _initCluster((clusterContainer) clusterContainer);
+            _initCluster((ClusterContainer) clusterContainer);
         } else {
             _initLocalConf(globalConf, context.getPolicyFactory());
         }
 
-        return null;
+        RouteOverview.enableRouteOverview(webAppConf.getContext() + "/api");
+        Spark.awaitInitialization();
+        valid = true;
+
+        return this;
     }
 
 
@@ -148,6 +157,16 @@ public class RestContainer implements Container<RestDefineFactory> {
                         break;
                     case PUT:
                         Spark.put(key, jsonAccept, _route(proxy, value), _toJson());
+                        break;
+                    case POST:
+                        Spark.post(key, jsonAccept, _route(proxy, value), _toJson());
+                        break;
+                    case GET:
+                        Spark.get(key, jsonAccept, _route(proxy, value), _toJson());
+                        break;
+                    case DELETE:
+                        Spark.delete(key, jsonAccept, _route(proxy, value), _toJson());
+                        break;
                 }
             } catch (Exception e) {
                 log.error(e.toString(), e);
@@ -155,19 +174,51 @@ public class RestContainer implements Container<RestDefineFactory> {
         });
     }
 
-/*    private void _initCluster(ClusterContainer clusterContainer) {
-
-    }*/
-
-
-    private void _initLocalConf(Configuration globalConf, ComponentPolicyFactory policyFactory) {
-
+    private void _initCluster(ClusterContainer clusterContainer) {
+        if (clusterContainer.valid()) {
+            Set<Map.Entry<String, SharedMap>> clusterData = clusterContainer.getFactory().entrySet();
+            for (Map.Entry<String, SharedMap> data : clusterData) {
+                Gson gson = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();
+                Spark.get(data.getKey(), "application/json", (res, req) -> {
+                    SharedMap v = data.getValue();
+                    log.info("{}", v);
+                    return v;
+                }, gson::toJson);
+            }
+        } else {
+            log.warn("Cluster is not available.");
+        }
     }
 
 
+    private void _initLocalConf(Configuration globalConf, ComponentPolicyFactory policyFactory) {
+        SharedMap data = new SharedMap();
+        try {
+            data.setAddress(InetAddress.getLocalHost().toString());
+        } catch (UnknownHostException e) {
+            log.error(e.toString(), e);
+        }
+        data.setArgs(globalConf.getVmArgs());
+        data.setData(policyFactory);
+        data.setConf(globalConf.getNodeConfig());
+
+        Spark.get(globalConf.name(), "application/json", (res, req) -> {
+            log.info("{}", data);
+            return data;
+        }, _toJson());
+    }
+
+
+    /**
+     * Find RestBinder methods when HTTP request reached.
+     *
+     * @param proxy
+     * @param value
+     * @return
+     */
     private Route _route(final Object proxy, final RestDefine value) {
         return ((req, res) -> {
-            Object result = null;
+            Object result;
             try {
                 Method invokeTarget = methodMap.get(value.getUrl());
                 _printRequestLog(req, proxy, invokeTarget);
@@ -207,6 +258,7 @@ public class RestContainer implements Container<RestDefineFactory> {
     /**
      * JSON request로 인자를 받을 경우:
      * Query String으로 인자를 받을 경우: 1개의 파라미터로 선언된 이름이 중복될 경우, 최초의 1개만 인식함
+     *
      * @param values
      * @param req
      * @return
@@ -295,7 +347,6 @@ public class RestContainer implements Container<RestDefineFactory> {
             Gson gson = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();
             try {
                 return gson.toJson(model);
-
             } catch (Throwable e) {
                 log.error(e.toString(), e);
                 return gson.toJson(new ErrorResponse(e));

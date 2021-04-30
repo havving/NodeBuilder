@@ -76,6 +76,9 @@ public class Configuration implements Externalizable {
     }
 
 
+    public String name() {
+        return APPLICATION_NAME;
+    }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {

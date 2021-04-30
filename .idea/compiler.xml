@@ -9,6 +9,7 @@
         <module name="Tutorial" />
         <module name="NodeBuilder-core" />
         <module name="NodeBuilder-web" />
+        <module name="NodeBuilder-cluster" />
       </profile>
     </annotationProcessing>
   </component>
