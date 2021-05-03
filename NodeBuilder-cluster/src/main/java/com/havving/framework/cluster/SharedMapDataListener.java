@@ -1,7 +1,7 @@
 package com.havving.framework.cluster;
 
 import com.hazelcast.core.EntryEvent;
-import com.hazelcast.map.MapEvent;
+import com.hazelcast.core.MapEvent;
 import com.hazelcast.map.listener.*;
 
 /**

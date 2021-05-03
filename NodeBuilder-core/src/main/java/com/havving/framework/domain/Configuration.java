@@ -1,5 +1,6 @@
 package com.havving.framework.domain;
 
+import com.google.common.collect.Sets;
 import com.havving.framework.config.JvmArguments;
 import com.havving.framework.config.NodeConfig;
 import com.havving.framework.config.NodeConfigListener;
@@ -94,4 +95,19 @@ public class Configuration implements Externalizable {
         this.nodeConfig = (NodeConfig) in.readObject();
     }
 
+
+    /**
+     * NodeConfig에 대한 listener를 등록하여 config update시 사용함
+     *
+     * @param nodeConfigListener NodeConfigListener를 상속받은 클래스
+     * @return NodeConfigListener의 전체 사이즈
+     */
+    public int addNodeConfigListener(NodeConfigListener nodeConfigListener) {
+        if (nodeConfigListeners.isEmpty()) {
+            nodeConfigListeners = Sets.newHashSet();
+        }
+        this.nodeConfigListeners.add(nodeConfigListener);
+
+        return this.nodeConfigListeners.size();
+    }
 }

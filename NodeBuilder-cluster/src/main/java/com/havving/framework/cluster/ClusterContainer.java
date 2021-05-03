@@ -6,14 +6,12 @@ import com.havving.framework.annotation.Shared;
 import com.havving.framework.components.ComponentPolicyFactory;
 import com.havving.framework.components.Container;
 import com.havving.framework.components.SingletonProxyFactory;
+import com.havving.framework.config.NodeConfigListener;
 import com.havving.framework.config.extensions.Cluster;
 import com.havving.framework.domain.Configuration;
 import com.havving.framework.exception.ContainerInitializeException;
 import com.hazelcast.config.*;
-import com.hazelcast.core.Hazelcast;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
-import com.hazelcast.core.MultiMap;
+import com.hazelcast.core.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -92,7 +90,68 @@ public class ClusterContainer implements Container<IMap<String, SharedMap>> {
         );
 
 
-        return null;
+        clusterMap.addLocalEntryListener(new SharedMapDataListener<SharedMap>() {
+            @Override
+            public void entryAdded(EntryEvent<String, SharedMap> event) {
+                log.debug("{} has been added.", event.getKey());
+                log.trace("value - {}", event.getValue());
+            }
+
+            @Override
+            public void entryEvicted(EntryEvent<String, SharedMap> event) {
+                log.debug("{} has been evicted.", event.getKey());
+                log.trace("value - {}", event.getValue());
+            }
+
+            @Override
+            public void entryRemoved(EntryEvent<String, SharedMap> event) {
+                log.debug("{} has been removed.", event.getKey());
+                log.trace("value - {}", event.getValue());
+            }
+
+            @Override
+            public void entryUpdated(EntryEvent<String, SharedMap> event) {
+                log.info("{} has been updated.", ROOT);
+                if (log.isTraceEnabled()) {
+                    log.trace("{}", event.getKey());
+                    log.trace("was - {}", event.getOldValue());
+                    log.trace("be - {}", event.getValue());
+                } else {
+                    log.debug("{} - {}", event.getKey(), event.getValue());
+                }
+            }
+
+            @Override
+            public void mapCleared(MapEvent event) {
+
+            }
+
+            @Override
+            public void mapEvicted(MapEvent event) {
+
+            }
+        });
+
+        _shareToCluster(globalConf.name(), this.data);
+
+        NodeConfigListener listener = (nodeConfig) -> {
+            this.data.setConf(nodeConfig);
+            log.info("Clustered NodeConfig update to cluster. {}", nodeConfig);
+            _shareToCluster(globalConf.name(), this.data);
+        };
+
+        globalConf.addNodeConfigListener(listener);
+        log.info("NodeConfig cluster lookup enabled.");
+        this.ready = true;
+
+        return this;
+    }
+
+
+    private SharedMap _shareToCluster(String nodeId, SharedMap data) {
+        IMap<String, SharedMap> map = this.instance.getMap(ROOT);   //nodeId map create
+
+        return map.put(nodeId, data);
     }
 
 
@@ -135,7 +194,6 @@ public class ClusterContainer implements Container<IMap<String, SharedMap>> {
 
         return data;
     }
-
 
     @Override
     public boolean valid() {
