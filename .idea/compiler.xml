@@ -10,6 +10,7 @@
         <module name="NodeBuilder-core" />
         <module name="NodeBuilder-web" />
         <module name="NodeBuilder-cluster" />
+        <module name="NodeBuilder-scheduler" />
       </profile>
     </annotationProcessing>
   </component>

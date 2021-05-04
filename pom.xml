@@ -14,6 +14,7 @@
         <module>Tutorial</module>
         <module>NodeBuilder-web</module>
         <module>NodeBuilder-cluster</module>
+        <module>NodeBuilder-scheduler</module>
     </modules>
 
     <properties>
