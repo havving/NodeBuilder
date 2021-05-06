@@ -1,3 +1,5 @@
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 import lombok.Getter;
 import org.junit.Test;
@@ -52,5 +54,19 @@ public class ReflectionTest {
         private int id;
         private String title;
         private LocalDateTime date;
+    }
+
+
+    @Test
+    @Ignore
+    public void createJson() {
+        Gson gson = new Gson();
+        JsonObject object = new JsonObject();
+        object.addProperty("name", "Jin");
+        object.addProperty("department", "Google");
+        object.addProperty("employeeNumber", 220);
+
+        String json = gson.toJson(object);
+        System.out.println(json);
     }
 }
