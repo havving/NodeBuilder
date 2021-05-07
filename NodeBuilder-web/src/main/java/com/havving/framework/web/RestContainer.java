@@ -73,7 +73,7 @@ public class RestContainer implements Container<RestDefineFactory> {
                             define.setComponentId(key);
                             define.setMethodName(m.getName());
                             define.setUrl(anno.url());
-                            define.setAccept(anno.method());
+//                            define.setAccept(anno.method());
 
                             Parameter[] methodParameters = m.getParameters();
                             if (methodParameters != null && methodParameters.length > 0) {
@@ -91,7 +91,7 @@ public class RestContainer implements Container<RestDefineFactory> {
                                 }
                                 define.setMethodArgs(methodArgs);
                             }
-                            define.setContentType(anno.contentType().toString());
+//                            define.setContentType(anno.contentType().toString());
                             define.setReturnType(m.getReturnType().getName());
                             m.setAccessible(false);
                             restDefineFactory.put(anno.url(), define);

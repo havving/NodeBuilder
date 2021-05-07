@@ -45,4 +45,5 @@ public class ClusterTest {
         nodeConfig.setAppType(AppType.FIRE);
         configuration.apply(nodeConfig);
     }
+
 }

@@ -1,5 +1,3 @@
-package com.havving.framework;
-
 import org.junit.Test;
 
 import java.lang.annotation.Retention;

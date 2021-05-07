@@ -364,6 +364,27 @@ public class NodeBuilder {
         }
     }
 
+    public static void registGCHandler(VmDataHandlingWorker worker) {
+        if (gcDataHandlingWorker.get() != null) {
+            log.error("GC worker must be only.", new Exception("GC worker must be only."));
+            return;
+        } else {
+            gcDataHandlingWorker.set(worker);
+            log.info("GC worker registered. {}", worker);
+        }
+        GC_HANDLER_REGISTERED = true;
+    }
+
+
+    public static void hold() throws Exception {
+        if (!NodeBuilder.daemon.get().getState().equals(Thread.State.NEW)) {
+            daemon.get().join();
+        } else {
+            log.warn("FIRE mode didn't be set. NodeBuilder can't hold daemon thread.");
+        }
+    }
+
+
     @FunctionalInterface
     public interface VmDataHandlingWorker {
         JvmGcData handle(JvmGcData gcData);
