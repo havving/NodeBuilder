@@ -114,8 +114,12 @@ public class RestContainer implements Container<RestDefineFactory> {
     }
 
 
+    /**
+     * 서버 활성화
+     * @param webAppConf
+     * @param singletonProxyFactory
+     */
     private void _initServer(WebApp webAppConf, SingletonProxyFactory singletonProxyFactory) {
-        // 서버 활성화
         Spark.port(webAppConf.getPort());
         Spark.threadPool(webAppConf.getMaxConnection());
         Spark.staticFileLocation("/www");
@@ -174,6 +178,10 @@ public class RestContainer implements Container<RestDefineFactory> {
         });
     }
 
+    /**
+     * 클러스터 설정
+     * @param clusterContainer
+     */
     private void _initCluster(ClusterContainer clusterContainer) {
         if (clusterContainer.valid()) {
             Set<Map.Entry<String, SharedMap>> clusterData = clusterContainer.getFactory().entrySet();
