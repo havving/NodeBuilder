@@ -9,7 +9,6 @@ import com.havving.framework.components.SingletonProxyFactory;
 import com.havving.framework.config.NodeConfigListener;
 import com.havving.framework.config.extensions.Cluster;
 import com.havving.framework.domain.Configuration;
-import com.havving.framework.exception.ContainerInitializeException;
 import com.hazelcast.config.*;
 import com.hazelcast.core.*;
 import lombok.Getter;
@@ -21,12 +20,14 @@ import java.net.UnknownHostException;
 import java.util.stream.Stream;
 
 /**
+ * Cluster 기능 수행 class
+ *
  * @author HAVVING
  * @since 2021-04-30
  */
 @Slf4j
 public class ClusterContainer implements Container<IMap<String, SharedMap>> {
-    private static final String ROOT = "nod-info";
+    private static final String ROOT = "node-info";
     private IMap<String, SharedMap> clusterMap;
     private MultiMap<String, Externalizable> clusterMultiMap;
     @Getter
@@ -45,7 +46,7 @@ public class ClusterContainer implements Container<IMap<String, SharedMap>> {
     }
 
     @Override
-    public Container initializeToScan(String scanPackage) throws ContainerInitializeException {
+    public Container initializeToScan(String scanPackage) {
         System.setProperty("hazelcast.logging.type", "slf4j");
         NodeContext context = NodeBuilder.getContext();
 
@@ -76,7 +77,7 @@ public class ClusterContainer implements Container<IMap<String, SharedMap>> {
                             }
 
                             if (!Externalizable.class.isInstance(fieldData)) {
-                                log.error("Shared data must be implement Externalize.");
+                                log.error("Shared data must be implement externalize.");
                             } else {
                                 String id = anno.id();
                                 if (anno.type().equals(Shared.Type.Include)) {
@@ -88,7 +89,6 @@ public class ClusterContainer implements Container<IMap<String, SharedMap>> {
                             f.setAccessible(false);
                         })
         );
-
 
         clusterMap.addLocalEntryListener(new SharedMapDataListener<SharedMap>() {
             @Override
@@ -122,14 +122,10 @@ public class ClusterContainer implements Container<IMap<String, SharedMap>> {
             }
 
             @Override
-            public void mapCleared(MapEvent event) {
-
-            }
+            public void mapCleared(MapEvent event) {}
 
             @Override
-            public void mapEvicted(MapEvent event) {
-
-            }
+            public void mapEvicted(MapEvent event) {}
         });
 
         _shareToCluster(globalConf.name(), this.data);
@@ -149,12 +145,17 @@ public class ClusterContainer implements Container<IMap<String, SharedMap>> {
 
 
     private SharedMap _shareToCluster(String nodeId, SharedMap data) {
-        IMap<String, SharedMap> map = this.instance.getMap(ROOT);   //nodeId map create
+        IMap<String, SharedMap> map = this.instance.getMap(ROOT);   // nodeId map create
 
         return map.put(nodeId, data);
     }
 
 
+    /**
+     * Creates a new Hazelcast Instance (a new node in a cluster)
+     * @param - cluster configuration
+     * @return - the new Hazelcast Instance
+     */
     private HazelcastInstance _createInstance(Cluster clusterConf) {
         Config config = new Config();
         NetworkConfig network = config.getNetworkConfig();
