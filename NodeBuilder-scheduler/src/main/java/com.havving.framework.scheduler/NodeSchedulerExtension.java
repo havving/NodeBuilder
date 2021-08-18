@@ -3,9 +3,6 @@ package com.havving.framework.scheduler;
 import com.havving.framework.Extension;
 import com.havving.framework.exception.ContainerInitializeException;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 /**
  * Scheduler 모듈 활성화 객체
  *
