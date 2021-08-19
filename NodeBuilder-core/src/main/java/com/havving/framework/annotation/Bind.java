@@ -20,8 +20,6 @@ public @interface Bind {
     /**
      * Bind 될 Component명
      * 기본일 경우, 해당 필드명을 기준으로 주입함
-     *
-     * @return
      */
     String name() default "";
 }

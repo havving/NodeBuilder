@@ -5,7 +5,8 @@ import com.havving.framework.NodeBuilder;
 import com.havving.framework.config.NodeConfig;
 
 /**
- * Core 모듈에 Cluster 객체 등록
+ * Cluster 모듈 활성화 객체
+ * (Core 모듈에 Cluster 객체 등록)
  *
  * @author HAVVING
  * @since 2021-05-02

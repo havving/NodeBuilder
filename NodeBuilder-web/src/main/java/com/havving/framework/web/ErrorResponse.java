@@ -4,6 +4,8 @@ import lombok.Data;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
+ * 에러 출력 객체
+ *
  * @author HAVVING
  * @since 2021-04-29
  */

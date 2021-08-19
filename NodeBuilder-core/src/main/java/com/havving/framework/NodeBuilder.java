@@ -197,10 +197,14 @@ public class NodeBuilder {
             log.error(e.toString(), e);
             System.exit(-1);
         }
-
     }
 
 
+    /**
+     * pid 파일 생성
+     * @param appName - 파일명
+     * @return pid
+     */
     private static String _createPidFile(String appName) {
         try {
             File pidFile = new File(appName + ".pid");
@@ -210,7 +214,7 @@ public class NodeBuilder {
             String name = ManagementFactory.getRuntimeMXBean().getName();
             String pid = name.split("@")[0];
             FileUtils.write(pidFile, pid, Charset.forName("UTF-8"), false);
-            String logString = "Process ID file has been initialized. pid: " + pid + " locaction: " + pidFile.getAbsoluteFile();
+            String logString = "Process ID file has been initialized. pid: " + pid + " location: " + pidFile.getAbsoluteFile();
             System.out.println(logString);
             log.info(logString);
 
@@ -299,6 +303,9 @@ public class NodeBuilder {
     }
 
 
+    /**
+     * GC 로그 출력
+     */
     private static void _initGCLogger() {
         List<GarbageCollectorMXBean> gcBeans = ManagementFactory.getGarbageCollectorMXBeans();
         for (GarbageCollectorMXBean gcBean : gcBeans) {

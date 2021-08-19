@@ -8,6 +8,8 @@ import org.quartz.Trigger;
 import java.util.Map;
 
 /**
+ * Scheduler 기능 수행 class
+ *
  * @author HAVVING
  * @since 2021-05-05
  */

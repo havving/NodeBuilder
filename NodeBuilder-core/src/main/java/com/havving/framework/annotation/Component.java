@@ -18,7 +18,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface Component {
     /**
      * 설정 시, 해당 Object의 메서드가 수행될 때 수행 시간, 입력값, 리턴 타입을 체크하여 로깅
-     * @return
      */
     boolean methodTracing() default false;
 
