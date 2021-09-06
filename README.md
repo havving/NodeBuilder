@@ -36,7 +36,7 @@ Node는 기동 시 JVM 설정을 통한 초기 입력값 설정 필요
 ex)
 
 ```
-java com.epozen.framework.NodeBuilder -Dnode.app.name=Node01_ES_writer01 -Dnode.scan=com.epozen.app -Dnode.app.type=daemon
+java com.havving.framework.NodeBuilder -Dnode.app.name=Node01 -Dnode.scan=com.havving.app -Dnode.app.type=daemon
 ```
 
 ### 기동 옵션 설명
