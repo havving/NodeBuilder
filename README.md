@@ -1,6 +1,6 @@
 # NodeBuilder
 
-ARC 솔루션 구성을 위한 Node Application 작성 framework
+솔루션 구성을 위한 Node Application 작성 framework
 
 ## Requirements
 
